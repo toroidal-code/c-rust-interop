@@ -12,9 +12,13 @@
 
 all: main
 
-RUST_LIBS += \
-	-lstd-e32fa708-0.11.0 \
-	-lrustrt-805dca70-0.11.0 \
+RUST_REQ_LIBS = \
+	-ldl \
+	-lpthread \
+	-lgcc_s \
+	-lpthread \
+	-lc \
+	-lm \
 
 CFLAGS += \
 	-std=c11 \
@@ -24,17 +28,17 @@ CFLAGS += \
 %.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-%.o : %.rs
-	rustc --emit obj -o $@ $<
+%.a : %.rs
+	rustc -o $@ $<
  
-main : lib.o main.o
-	clang -o $@ $^ $(RUST_LIBS)
+main : main.o lib.a 
+	clang -o $@ $^ $(RUST_REQ_LIBS)
 
 # For every 'O' in TARGETS, generate a build target
 # $(foreach O, $(TARGETS), $(eval $O: $O.o))
  
 clean:
-	rm -f *.o
+	rm -f *.o *.a
  
 ######################################################################
 ### Makefile ends here
